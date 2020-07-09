@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Func.AspNetCore</RootNamespace>
+    <AssemblyName>Func.AspNetCore</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/awsxdr/func-aspnetcore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/awsxdr/func-aspnetcore</RepositoryUrl>
+    <Authors>Daniel Errington</Authors>
+    <Company />
+    <Version>0.1.0</Version>
+    <Description>Extends the Func library to improve support for ASP.NET Core</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Func" Version="0.1.0" />
+  </ItemGroup>
+
+</Project>

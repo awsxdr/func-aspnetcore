@@ -16,7 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Func" Version="0.1.0" />
+    <PackageReference Include="Func" Version="0.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.6" />
   </ItemGroup>
 
 </Project>

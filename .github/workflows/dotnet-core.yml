@@ -35,6 +35,6 @@ jobs:
     - name: Persist artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: Func.AspNetCore.nupkg
+        name: Func.AspNetCore.${{ steps.gitversion.outputs.NuGetVersionV2 }}
         path: Func.AspNetCore/bin/Release/Func.AspNetCore.${{ steps.gitversion.outputs.NuGetVersionV2 }}.nupkg
         

@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -36,5 +36,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: Func.AspNetCore.${{ steps.gitversion.outputs.NuGetVersionV2 }}
-        path: Func.AspNetCore/bin/Release/Func.AspNetCore.${{ steps.gitversion.outputs.NuGetVersionV2 }}.nupkg
+        path: |
+            Func.AspNetCore/bin/Release/Func.AspNetCore.${{ steps.gitversion.outputs.NuGetVersionV2 }}.nupkg
+            Func.AspNet/bin/Release/Func.AspNet.${{ steps.gitversion.outputs.NuGetVersionV2 }}.nupkg
         

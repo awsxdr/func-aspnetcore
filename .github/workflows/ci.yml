@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ develop ]
   pull_request:
-    branches: [ master ]
+    branches: [ develop ]
 
 jobs:
   build:
@@ -29,12 +29,12 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.NuGetVersionV2 }}
+      run: dotnet build --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.FullSemVer }}
     - name: Persist artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: Func.AspNetCore.${{ steps.gitversion.outputs.NuGetVersionV2 }}
+        name: Func.AspNetCore.${{ steps.gitversion.outputs.FullSemVer }}
         path: |
-            Func.AspNetCore/bin/Release/Func.AspNetCore.${{ steps.gitversion.outputs.NuGetVersionV2 }}.nupkg
-            Func.AspNet/bin/Release/Func.AspNet.${{ steps.gitversion.outputs.NuGetVersionV2 }}.nupkg
+            Func.AspNetCore/bin/Release/Func.AspNetCore.${{ steps.gitversion.outputs.FullSemVer }}.nupkg
+            Func.AspNet/bin/Release/Func.AspNet.${{ steps.gitversion.outputs.FullSemVer }}.nupkg
         

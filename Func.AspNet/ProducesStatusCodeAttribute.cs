@@ -2,20 +2,20 @@
 {
     using System;
     using System.Net;
-    using System.Net.Http;
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public sealed class ProducesStatusCodeAttribute : Attribute
     {
         public HttpStatusCode StatusCode { get; }
-        public string Message { get; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
 
-        internal HttpResponseMessage ToResponseMessage() =>
-            new HttpResponseMessage(StatusCode) { Content = new StringContent(Message) };
+        private readonly Lazy<ResponseDetails> _responseDetailsFactory;
+        internal ResponseDetails ResponseDetails => _responseDetailsFactory.Value;
 
         public ProducesStatusCodeAttribute(HttpStatusCode statusCode)
         {
             StatusCode = statusCode;
+            _responseDetailsFactory = new Lazy<ResponseDetails>(() => new ResponseDetails { Message = Message, StatusCode = StatusCode });
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Func.AspNet.Example.Controllers
 {
     using System.Net;
+    using System.Threading.Tasks;
     using System.Web.Http;
     using Func;
     using static Func.ResultHelper;
@@ -19,7 +20,7 @@
 
         [HttpGet, Route("d")]
         [OnFailure(typeof(NotFoundError), HttpStatusCode.NotFound)]
-        public Result<int> GetD() => ResultHelper<int>.Fail(new NotFoundError());
+        public Task<Result<int>> GetD() => ResultHelper<int>.Fail(new NotFoundError()).ToTask();
 
         [HttpGet, Route("e")]
         public Result GetE() => Fail(new UnauthorizedError());
@@ -34,7 +35,7 @@
 
         [HttpGet, Route("h")]
         [OnFailure(typeof(PageNotFoundError), HttpStatusCode.NotFound, Message = "Page not found")]
-        [OnFailure(typeof(DocumentNotFoundError), HttpStatusCode.NotFound, Message = "Document not found")]
+        [OnFailure(typeof(DocumentNotFoundError), HttpStatusCode.NotFound)]
         public Result GetH(string type)
         {
             switch(type)

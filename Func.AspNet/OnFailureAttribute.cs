@@ -11,13 +11,14 @@
         public Type ErrorType { get; }
         public string Message { get; set; } = string.Empty;
 
-        internal HttpResponseMessage ToResponseMessage() =>
-            new HttpResponseMessage(StatusCode) { Content = new StringContent(Message) };
+        private Lazy<ResponseDetails> _responseDetailsFactory;
+        internal ResponseDetails ResponseDetails => _responseDetailsFactory.Value;
 
         public OnFailureAttribute(Type errorType, HttpStatusCode statusCode)
         {
             StatusCode = statusCode;
             ErrorType = errorType;
+            _responseDetailsFactory = new Lazy<ResponseDetails>(() => new ResponseDetails { Message = Message, StatusCode = StatusCode });
         }
     }
 }

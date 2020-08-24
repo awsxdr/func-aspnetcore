@@ -74,13 +74,29 @@
 
         private static HttpResponseMessage GetFailureResult(HttpActionContext context, Failure failure)
         {
-            var errorType = failure.GetError().GetType();
+            var error = failure.GetError();
+            var errorType = error.GetType();
 
-            return
-                GetCustomAttributesForControllerMethod<OnFailureAttribute>(context.ControllerContext.Controller as ApiController)
-                ?.FirstOrDefault(x => x.ErrorType.IsAssignableFrom(errorType))?.ToResponseMessage()
-                ?? errorType.GetCustomAttribute<ProducesStatusCodeAttribute>()?.ToResponseMessage()
-                ?? new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            void PopulateErrorMessageIfRequired(ResponseDetails response)
+            {
+                if (string.IsNullOrEmpty(response.Message))
+                {
+                    response.Message =
+                        errorType.GetCustomAttribute<MessageTextSourceAttribute>()
+                        ?.SourceName.Map(x => errorType.GetMethod(x) ?? errorType.GetProperty(x).GetGetMethod())
+                        ?.Invoke(error, new object[0]) as string
+                        ?? string.Empty;
+                }
+            }
+
+            return (
+                    GetCustomAttributesForControllerMethod<OnFailureAttribute>(context.ControllerContext.Controller as ApiController)
+                    ?.FirstOrDefault(x => x.ErrorType.IsAssignableFrom(errorType))?.ResponseDetails
+                    ?? errorType.GetCustomAttribute<ProducesStatusCodeAttribute>()?.ResponseDetails
+                    ?? new ResponseDetails { StatusCode = HttpStatusCode.InternalServerError }
+                )
+                .Tee(PopulateErrorMessageIfRequired)
+                .Map(x => new HttpResponseMessage(x.StatusCode) { Content = new StringContent(x.Message) });
         }
 
         private static IEnumerable<TAttribute> GetCustomAttributesForControllerMethod<TAttribute>(ApiController controller)

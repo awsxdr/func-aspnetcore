@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net45;net452;net461;net472;net48</TargetFrameworks>
+    <RootNamespace>Func.AspNet</RootNamespace>
+    <AssemblyName>Func.AspNet.Abstractions</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/awsxdr/func-aspnetcore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/awsxdr/func-aspnetcore</RepositoryUrl>
+    <Authors>Daniel Errington</Authors>
+    <Company />
+    <Version>0.1.0</Version>
+    <Description>Common types from Func.AspNet</Description>
+  </PropertyGroup>
+
+</Project>

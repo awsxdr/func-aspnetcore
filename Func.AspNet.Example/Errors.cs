@@ -15,6 +15,6 @@
         public string Message => $"Could not find document {Id}";
     }
 
-    [ProducesStatusCode(HttpStatusCode.Unauthorized, Message = "Not found")]
+    [ProducesStatusCode(HttpStatusCode.Unauthorized, Message = "Unauthorized")]
     public class UnauthorizedError : ResultError { }
 }

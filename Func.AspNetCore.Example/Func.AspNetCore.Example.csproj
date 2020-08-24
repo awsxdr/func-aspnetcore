@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Func.AspNetCore\Func.AspNetCore.csproj" />
+    <ProjectReference Include="..\Func.AspNet.Abstractions\Func.AspNet.Abstractions.csproj" />
+    <ProjectReference Include="..\Func.AspNet\Func.AspNet.csproj" />
   </ItemGroup>
 
 

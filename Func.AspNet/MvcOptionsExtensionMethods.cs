@@ -1,4 +1,5 @@
-﻿namespace Func.AspNetCore
+﻿#if NETSTANDARD
+namespace Func.AspNet
 {
     using Microsoft.AspNetCore.Mvc;
 
@@ -8,3 +9,4 @@
             mvcOptions.Filters.Add(new ResultFilter());
     }
 }
+#endif

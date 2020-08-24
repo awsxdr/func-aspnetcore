@@ -10,7 +10,7 @@
         public string Message { get; set; } = string.Empty;
 
         private readonly Lazy<ResponseDetails> _responseDetailsFactory;
-        internal ResponseDetails ResponseDetails => _responseDetailsFactory.Value;
+        public ResponseDetails ResponseDetails => _responseDetailsFactory.Value;
 
         public ProducesStatusCodeAttribute(HttpStatusCode statusCode)
         {

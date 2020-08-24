@@ -1,4 +1,4 @@
-﻿namespace Func.AspNetCore
+﻿namespace Func.AspNet
 {
     using System.Net;
 

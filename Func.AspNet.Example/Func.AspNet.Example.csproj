@@ -109,6 +109,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Func.AspNet.Abstractions\Func.AspNet.Abstractions.csproj">
+      <Project>{126219e8-ca5b-4a9e-a36b-ba85628c95ee}</Project>
+      <Name>Func.AspNet.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Func.AspNet\Func.AspNet.csproj">
       <Project>{97833135-ffde-4302-bc8c-eddb00d83d46}</Project>
       <Name>Func.AspNet</Name>

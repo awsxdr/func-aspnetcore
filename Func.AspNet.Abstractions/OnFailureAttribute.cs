@@ -2,7 +2,6 @@
 {
     using System;
     using System.Net;
-    using System.Net.Http;
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public sealed class OnFailureAttribute : Attribute
@@ -12,7 +11,7 @@
         public string Message { get; set; } = string.Empty;
 
         private Lazy<ResponseDetails> _responseDetailsFactory;
-        internal ResponseDetails ResponseDetails => _responseDetailsFactory.Value;
+        public ResponseDetails ResponseDetails => _responseDetailsFactory.Value;
 
         public OnFailureAttribute(Type errorType, HttpStatusCode statusCode)
         {

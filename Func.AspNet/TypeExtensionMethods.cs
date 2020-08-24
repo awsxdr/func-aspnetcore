@@ -1,4 +1,5 @@
-﻿namespace Func.AspNet
+﻿#if NETFRAMEWORK
+namespace Func.AspNetCore
 {
     using System;
     using System.Linq;
@@ -11,3 +12,4 @@
             as TAttribute;
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿namespace Func.AspNet
+﻿#if NETFRAMEWORK
+namespace Func.AspNet
 {
     using System.Web.Http;
 
@@ -8,3 +9,4 @@
             configuration.Filters.Add(new ResultFilter());
     }
 }
+#endif

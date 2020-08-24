@@ -1,7 +1,9 @@
 ﻿namespace Func.AspNetCore.Example.Controllers
 {
+    using Func.AspNet;
     using Microsoft.AspNetCore.Mvc;
-
+    using System.Net;
+    using System.Threading.Tasks;
     using static Func.Result;
 
     [ApiController]
@@ -17,23 +19,23 @@
         public Result GetC() => Succeed();
 
         [HttpGet("/d")]
-        [OnFailure(typeof(NotFoundError), 404)]
-        public Result<int> GetD() => Result<int>.Fail(new NotFoundError());
+        [OnFailure(typeof(NotFoundError), HttpStatusCode.NotFound)]
+        public Task<Result<int>> GetD() => Result<int>.Fail(new NotFoundError()).ToTask();
 
         [HttpGet("/e")]
         public Result GetE() => Fail(new UnauthorizedError());
 
         [HttpGet("/f")]
-        [OnFailure(typeof(UnauthorizedError), 405)]
+        [OnFailure(typeof(UnauthorizedError), HttpStatusCode.MethodNotAllowed)]
         public Result GetF() => Fail(new UnauthorizedError());
 
         [HttpGet("/g")]
-        [OnSuccess(201)]
+        [OnSuccess(HttpStatusCode.Created)]
         public Result GetG() => Succeed(123);
 
         [HttpGet("/h")]
-        [OnFailure(typeof(PageNotFoundError), 404, Message = "Page not found")]
-        [OnFailure(typeof(DocumentNotFoundError), 404, Message = "Document not found")]
+        [OnFailure(typeof(PageNotFoundError), HttpStatusCode.NotFound, Message = "Page not found")]
+        [OnFailure(typeof(DocumentNotFoundError), HttpStatusCode.NotFound)]
         public Result GetH([FromQuery] string type) =>
             type switch
             {
@@ -42,10 +44,5 @@
                 "s" => Succeed(123),
                 _ => Fail(new NotFoundError())
             };
-    }
-
-    public class TestError : ResultError
-    {
-
     }
 }

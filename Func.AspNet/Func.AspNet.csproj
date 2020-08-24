@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  
   <PropertyGroup>
-    <TargetFrameworks>net45;net452;net461;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net45;net452;net461;net472;net48</TargetFrameworks>
     <RootNamespace>Func.AspNet</RootNamespace>
     <AssemblyName>Func.AspNet</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -11,17 +11,38 @@
     <RepositoryUrl>https://github.com/awsxdr/func-aspnetcore</RepositoryUrl>
     <Authors>Daniel Errington</Authors>
     <Company />
-    <Version>0.1.9</Version>
+    <Version>0.1.0</Version>
     <Description>Extends the Func library to improve support for ASP.NET Core</Description>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup Condition="$(TargetFramework) == 'netstandard2.0' OR $(TargetFramework) == 'netstandard2.1'">
+    <Framework>NetStandard</Framework>
+    <DefineConstants>NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(Framework) == ''">
+    <Framework>NetFramework</Framework>
+    <DefineConstants>NETFRAMEWORK</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(Framework) == 'NetFramework'">
     <PackageReference Include="Func" Version="0.1.9" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(Framework) == 'NetStandard'">
+    <PackageReference Include="Func" Version="0.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Func.AspNet.Abstractions\Func.AspNet.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

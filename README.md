@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/awsxdr/func-aspnetcore/blob/master/LICENSE)
 ![CI](https://github.com/awsxdr/func-aspnetcore/workflows/CI/badge.svg)
 
-Add-on for [Func](https://github.com/awsxdr/func) with ASP .NET specific features
+Func.AspNet is an add-on for [Func](https://github.com/awsxdr/func) which simplifies the returning of `Result` objects from ASP .NET. The library handles the conversion from success and failure results to HTTP status codes as well as unwrapping the value (if any) contained in a success.
 
 ##  Getting Started
 

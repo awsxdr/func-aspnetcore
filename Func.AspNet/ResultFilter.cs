@@ -160,7 +160,7 @@
                 {
                     Content =
                         success.GetValue() is Some<object> s
-                        ? new ObjectContent(s.Value.GetType(), s.Value, new JsonMediaTypeFormatter())
+                        ? new ObjectContent(s.Value.GetType(), s.Value, context.ControllerContext.Configuration.Formatters.JsonFormatter)
                         : null
                 };
 

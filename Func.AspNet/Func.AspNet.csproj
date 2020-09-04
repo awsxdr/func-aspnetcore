@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net45;net452;net461;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net45;net452;net461;net47;net472;net48</TargetFrameworks>
     <RootNamespace>Func.AspNet</RootNamespace>
     <AssemblyName>Func.AspNet</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(Framework) == 'NetFramework'">
-    <PackageReference Include="Func" Version="0.1.9" />
+    <PackageReference Include="Func" Version="0.2.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(Framework) == 'NetStandard'">
-    <PackageReference Include="Func" Version="0.1.9" />
+    <PackageReference Include="Func" Version="0.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.6" />

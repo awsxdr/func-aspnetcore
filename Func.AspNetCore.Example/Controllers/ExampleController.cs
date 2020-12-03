@@ -1,5 +1,6 @@
 ﻿namespace Func.AspNetCore.Example.Controllers
 {
+    using System.ComponentModel.DataAnnotations;
     using Func.AspNet;
     using Microsoft.AspNetCore.Mvc;
     using System.Net;
@@ -42,6 +43,7 @@
                 "p" => Fail(new PageNotFoundError()),
                 "d" => Fail(new DocumentNotFoundError()),
                 "s" => Succeed(123),
+                "x" => throw new ValidationException("Something terrible happened!", null, new { MoreDetails = "Some more details would go here" }),
                 _ => Fail(new NotFoundError())
             };
     }

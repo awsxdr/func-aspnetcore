@@ -1,5 +1,7 @@
 ﻿namespace Func.AspNet.Example.Controllers
 {
+    using System;
+    using System.ComponentModel.DataAnnotations;
     using System.Net;
     using System.Threading.Tasks;
     using System.Web.Http;
@@ -43,6 +45,7 @@
                 case "p": return Fail(new PageNotFoundError());
                 case "d": return Fail(new DocumentNotFoundError());
                 case "s": return Succeed(123);
+                case "x": throw new ValidationException("Something terrible happened!", null, new { MoreDetails = "Some more details would go here" });
                 default: return Fail(new NotFoundError());
             }
         }

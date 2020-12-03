@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(Framework) == 'NetFramework'">
-    <PackageReference Include="Func" Version="0.2.0" />
+    <PackageReference Include="Func" Version="0.2.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(Framework) == 'NetStandard'">
-    <PackageReference Include="Func" Version="0.2.0" />
+    <PackageReference Include="Func" Version="0.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.6" />

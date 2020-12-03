@@ -7,7 +7,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Net.Http;
-    using System.Net.Http.Formatting;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Filters;
@@ -20,11 +19,23 @@
 
     public class ResultFilter : IActionFilter
     {
+        private readonly ResultConversionConfiguration _configuration;
+
+        private readonly IDictionary<Type, Func<ResultError, ResponseDetails, ErrorResponse>> _errorResponseFactories =
+            new Dictionary<Type, Func<ResultError, ResponseDetails, ErrorResponse>>();
+
+        public ResultFilter(ResultConversionConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
 #if NETSTANDARD
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            if(ResponseIsResultType(context.Result, out var result))
+            if (ResponseIsResultType(context.Result, out var result))
                 context.Result = GetActionResultForResult(context, result);
+            else if (context.Exception != null && !context.ExceptionHandled)
+                UpdateActionResultForException(context);
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -45,7 +56,7 @@
             }
         }
 
-        private static IActionResult GetActionResultForResult(ActionExecutedContext context, Result result)
+        private IActionResult GetActionResultForResult(ActionExecutedContext context, Result result)
         {
             switch (result)
             {
@@ -58,9 +69,21 @@
             }
         }
 
+        private void UpdateActionResultForException(ActionExecutedContext context)
+        {
+            if (!(_configuration.ExceptionResponseConverter is Some<IExceptionResponseConverter> exceptionConverter))
+                return;
+
+            context.ExceptionHandled = true;
+
+            context.Result =
+                exceptionConverter.Value.GetExceptionResponse(context.Exception)
+                    .Map(CreateResponseForErrorResponse);
+        }
+
         private static IActionResult GetSuccessResult(ActionExecutedContext context, Success success)
         {
-            IActionResult GetResultForSuccess(HttpStatusCode statusCode)
+            IActionResult ResultForSuccess(HttpStatusCode statusCode)
             {
                 switch(success.GetValue())
                 {
@@ -76,10 +99,10 @@
                 .SingleOrDefault()
                 ?.StatusCode
                 ?? HttpStatusCode.OK)
-            .Map(GetResultForSuccess);
+            .Map(ResultForSuccess);
         }
 
-        private static IActionResult GetFailureResult(ActionExecutedContext context, Failure failure)
+        private IActionResult GetFailureResult(ActionExecutedContext context, Failure failure)
         {
             var error = failure.GetError();
             var errorType = error.GetType();
@@ -103,10 +126,12 @@
                     ?? new ResponseDetails { StatusCode = HttpStatusCode.InternalServerError }
                 )
                 .Tee(PopulateErrorMessageIfRequired)
-                .Map(x => string.IsNullOrEmpty(x.Message) 
-                    ? (IActionResult) new StatusCodeResult((int)x.StatusCode)
-                    : new ObjectResult(x.Message) { StatusCode = (int)x.StatusCode });
+                .Map(GetResponseFactory(errorType), error)
+                .Map(CreateResponseForErrorResponse);
         }
+
+        private static IActionResult CreateResponseForErrorResponse(ErrorResponse errorResponse) =>
+            new ObjectResult(errorResponse.Body) { StatusCode = (int)errorResponse.StatusCode };
 
         private static IEnumerable<TAttribute> GetCustomAttributesForControllerMethod<TAttribute>(ControllerBase controller)
             where TAttribute : Attribute
@@ -118,12 +143,24 @@
 
         public async Task<HttpResponseMessage> ExecuteActionFilterAsync(HttpActionContext actionContext, CancellationToken cancellationToken, Func<Task<HttpResponseMessage>> continuation)
         {
-            var response = await continuation();
+            try
+            {
+                var response = await continuation();
 
-            if (ResponseIsResultType(response, out var result))
-                response = GetHttpResponseForResult(actionContext, result);
+                if (ResponseIsResultType(response, out var result))
+                    response = GetHttpResponseForResult(actionContext, result);
 
-            return response;
+                return response;
+            }
+            catch(Exception exception)
+            {
+                if (_configuration.ExceptionResponseConverter is Some<IExceptionResponseConverter> exceptionConverter)
+                    return
+                        exceptionConverter.Value.GetExceptionResponse(exception)
+                            .Map(CreateResponseForErrorResponse, actionContext);
+
+                throw;
+            }
         }
 
         private static bool ResponseIsResultType(HttpResponseMessage response, out Result result)
@@ -140,7 +177,7 @@
             }
         }
 
-        private static HttpResponseMessage GetHttpResponseForResult(HttpActionContext context, Result result)
+        private HttpResponseMessage GetHttpResponseForResult(HttpActionContext context, Result result)
         {
             switch (result)
             {
@@ -155,24 +192,22 @@
 
         private static HttpResponseMessage GetSuccessResult(HttpActionContext context, Success success)
         {
-            HttpResponseMessage GetResultForSuccess(HttpStatusCode statusCode) =>
-                new HttpResponseMessage(statusCode)
-                {
-                    Content =
-                        success.GetValue() is Some<object> s
-                        ? new ObjectContent(s.Value.GetType(), s.Value, context.ControllerContext.Configuration.Formatters.JsonFormatter)
-                        : null
-                };
+            HttpResponseMessage ResultForSuccess(HttpStatusCode statusCode) =>
+                context.Request.CreateResponse(
+                    statusCode,
+                    success.GetValue() is Some<object> s
+                        ? s.Value
+                        : null);
 
             return (
                 GetCustomAttributesForControllerMethod<OnSuccessAttribute>(context.ControllerContext.Controller as ApiController)
                 .SingleOrDefault()
                 ?.StatusCode
                 ?? HttpStatusCode.OK)
-            .Map(GetResultForSuccess);
+            .Map(ResultForSuccess);
         }
 
-        private static HttpResponseMessage GetFailureResult(HttpActionContext context, Failure failure)
+        private HttpResponseMessage GetFailureResult(HttpActionContext context, Failure failure)
         {
             var error = failure.GetError();
             var errorType = error.GetType();
@@ -196,13 +231,28 @@
                     ?? new ResponseDetails { StatusCode = HttpStatusCode.InternalServerError }
                 )
                 .Tee(PopulateErrorMessageIfRequired)
-                .Map(x => new HttpResponseMessage(x.StatusCode) { Content = new StringContent(x.Message) });
+                .Map(GetResponseFactory(errorType), error)
+                .Map(CreateResponseForErrorResponse, context);
         }
+
+        private static HttpResponseMessage CreateResponseForErrorResponse(HttpActionContext context, ErrorResponse errorResponse) =>
+            context.Request.CreateResponse(errorResponse.StatusCode, errorResponse.Body);
 
         private static IEnumerable<TAttribute> GetCustomAttributesForControllerMethod<TAttribute>(ApiController controller)
             where TAttribute : Attribute
             =>
             controller?.ActionContext.ActionDescriptor.GetCustomAttributes<TAttribute>();
 #endif
+
+        private Func<ResultError, ResponseDetails, ErrorResponse> GetResponseFactory(Type errorType) =>
+            _errorResponseFactories.ContainsKey(errorType)
+                ? _errorResponseFactories[errorType]
+                : _errorResponseFactories[errorType] =
+                    typeof(IErrorResponseConverter)
+                        .GetMethod(nameof(IErrorResponseConverter.GetErrorResponse))
+                        ?.MakeGenericMethod(errorType)
+                        .Map<MethodInfo, Func<ResultError, ResponseDetails, ErrorResponse>>(
+                            m => (e, d) =>
+                                (ErrorResponse)m.Invoke(_configuration.ErrorResponseConverter, new object[] { e, d }));
     }
 }

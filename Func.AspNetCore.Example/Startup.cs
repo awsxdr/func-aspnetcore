@@ -1,5 +1,8 @@
 namespace Func.AspNetCore.Example
 {
+    using System;
+    using System.ComponentModel.DataAnnotations;
+    using System.Net;
     using Func.AspNet;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -21,7 +24,10 @@ namespace Func.AspNetCore.Example
         {
             services.AddControllers(config =>
             {
-                config.AddResultConversion();
+                config.AddResultConversion(resultConfig =>
+                    resultConfig
+                        .WithExceptionHandler(new TestExceptionResponseConverter())
+                        .WithErrorResponseConverter(new TestErrorResponseConverter()));
             });
         }
 
@@ -43,4 +49,42 @@ namespace Func.AspNetCore.Example
             });
         }
     }
+
+    public class TestExceptionResponseConverter : IExceptionResponseConverter
+    {
+        public ErrorResponse GetExceptionResponse(Exception exception) =>
+            new ErrorResponse
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Body = new
+                {
+                    Message = $"Oops! An error occurred: {exception.GetType().Name}",
+                    ExtraDetails = (exception is ValidationException ve) ? ve.Value : null,
+                }
+            };
+    }
+
+    public class TestErrorResponseConverter : IErrorResponseConverter
+    {
+        public ErrorResponse GetErrorResponse<TError>(TError error, ResponseDetails configuredResponseDetails)
+            where TError : ResultError =>
+            new ErrorResponse
+            {
+                StatusCode = HttpStatusCode.NotImplemented,
+                Body = new TestErrorResponseData
+                {
+                    TestField = "This is a test",
+                    Message = configuredResponseDetails.Message,
+                    ActualStatusCode = (int)configuredResponseDetails.StatusCode
+                }
+            };
+
+        public class TestErrorResponseData
+        {
+            public string TestField { get; set; }
+            public string Message { get; set; }
+            public int ActualStatusCode { get; set; }
+        }
+    }
+
 }

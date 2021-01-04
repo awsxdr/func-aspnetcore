@@ -18,6 +18,7 @@
         public int GetB() => 123;
 
         [HttpGet, Route("c")]
+        [OnSuccess(HttpStatusCode.NoContent)]
         public Result GetC() => Succeed();
 
         [HttpGet, Route("d")]

@@ -193,11 +193,9 @@
         private static HttpResponseMessage GetSuccessResult(HttpActionContext context, Success success)
         {
             HttpResponseMessage ResultForSuccess(HttpStatusCode statusCode) =>
-                context.Request.CreateResponse(
-                    statusCode,
-                    success.GetValue() is Some<object> s
-                        ? s.Value
-                        : null);
+                success.GetValue() is Some<object> s
+                    ? context.Request.CreateResponse(statusCode, s.Value)
+                    : context.Request.CreateResponse(statusCode);
 
             return (
                 GetCustomAttributesForControllerMethod<OnSuccessAttribute>(context.ControllerContext.Controller as ApiController)
